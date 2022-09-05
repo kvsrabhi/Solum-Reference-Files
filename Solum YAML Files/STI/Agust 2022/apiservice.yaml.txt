@@ -1,0 +1,82 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apiservice-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: apiservice   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: apiservice
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/template_mgmt_api_img:3593   # The path of container 
+        name: apiservice   # Container name
+        ports:
+        - containerPort: 8080   # Port number
+        livenessProbe:
+          httpGet:
+            path: /api/v1/heartbeat
+            port: 8080
+            scheme: HTTP
+            httpHeaders:
+            - name: apiKey
+              value:  "AhaBOWah.oSmXBhSMIZKGxgRcWLmaJRtSALRnowlYoZB"
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 5
+        env:
+        - name: apiservice_release_date
+          value: "2022-08-23 10:06:44"
+        - name: apiservice_version_info
+          value: "3593"
+        - name: dashboard_release_date
+          value: "2022-08-25 05:58:39"
+        - name: dashboard_version_info
+          value: "3601"
+        - name: ld_release_date
+          value: "2022-08-23 10:03:33"
+        - name: ld_version_info
+          value: "3592"
+        - name: base_version_string
+          value: "1.1.2"
+        - name: ld_base_version_string
+          value: "1.1.2"
+        - name: dashboard_base_version_string
+          value: "1.1.2"
+        resources:
+          requests:
+            cpu: 3000m
+          limits:
+            cpu: 3000m
+       
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/app/env
+      volumes:
+        - name: config-volume
+          configMap:
+            name: api-configmap
+      terminationGracePeriodSeconds: 1200
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: apiservice-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 8080
+        selector:
+          app: apiservice

@@ -1,0 +1,68 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scheduler-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: scheduler   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: scheduler
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/common_scheduler_img:3192   # The path of container 
+        name: scheduler   # Container name
+        ports:
+        - containerPort: 8081   # Port number
+        livenessProbe:
+          httpGet:
+            path: /api/v1/heartbeat
+            port: 8081
+            scheme: HTTP
+            httpHeaders:
+            - name: apiKey
+              value:  "AhaBOWah.oSmXBhSMIZKGxgRcWLmaJRtSALRnowlYoZB"
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 5
+        env:
+        - name: release_date
+          value: "2022-07-03 00:30:43"
+        - name: base_version_string
+          value: "1.1.2"
+        - name: version_info
+          value: "3192"
+        resources:
+          requests:
+            cpu: 500m
+          limits:
+            cpu: 1000m
+        
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/app/env
+      volumes:
+        - name: config-volume
+          configMap:
+            name: scheduler-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: scheduler-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 8081
+        selector:
+          app: scheduler

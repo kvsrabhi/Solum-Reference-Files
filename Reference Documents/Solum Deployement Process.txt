@@ -1,0 +1,30 @@
+1. Do all yaml changes(tag and release info) and Stop ingress
+	
+2. Stop all Ms and wait until all MS are completely stopped
+	./delete.sh all
+
+3. Change API service properties '/home/sti/git_cloud_sti/slm-config/slm-apiservice-common/apiservice.properties'
+	GENERATE_DB_SCRIPT = YES
+
+4. Do all other MS's configmap changes and recreate configmap
+	./remove_configmap.sh
+	./make_configmap.sh
+
+5. run only API service and keep checking logs untill it is finished
+	./run.sh api
+	./kc logs pod/apiservice-deployment-5bb66d4b5b-ww7g8 -f
+
+6. Change API service properties '/home/sti/git_cloud_sti/slm-config/slm-apiservice-common/apiservice.properties'
+	GENERATE_DB_SCRIPT = NO
+
+7. Recreate configmap
+	./remove_configmap.sh
+	./make_configmap.sh
+	
+8. Run all MS and restart ingress after all MS are up
+	./run.sh all
+	kubectl apply -f solum-ingress.yaml
+
+9. Check for 10 mins until all MS are deployed successfully and up & running
+
+10. Check All MS versions in Dashboard UI and compare if it is same as stage00

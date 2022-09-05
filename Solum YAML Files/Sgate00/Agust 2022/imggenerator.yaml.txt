@@ -1,0 +1,104 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imggenerator-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: imggenerator   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: imggenerator
+        env: stage
+    spec:
+            # tolerations:
+            # - key: scheduling.cast.ai/spot
+            #operator: Exists
+            #nodeSelector:
+            # scheduling.cast.ai/spot: "true"
+      containers:
+      - image: solumacrms.azurecr.io/common_ig_jdk16_img:3575  # The path of container 
+        name: imggenerator   # Container name
+        ports:
+        - containerPort: 9007   # Port number
+        livenessProbe:
+          httpGet:
+            path: /imagegenerator/api/v1/heartbeat
+            port: 9007
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 10
+        env:
+        - name: release_date
+          value: "2022-08-19 10:49:56"
+        - name: debug_enable
+          value: "false"
+        - name: minio_enable
+          value: "false"
+        - name: base_version_string
+          value: "1.1.2"
+        - name: version_info
+          value: "3575"
+        - name: JAVA_OPTS
+          value: "-XX:+DisableAttachMechanism -XX:+PrintCommandLineFlags -Xms1024m -Xmx4096m -XX:MaxMetaspaceSize=1024m"
+        - name: EVENTHUB_CONNECTIONSTRING_ENV_NAME
+          value: "Endpoint=sb://common-stage-eventhub00.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=u/+efaI9HatN+HvKJUcvGHsVabh46cQZZAGoL4fLpP4=;EntityPath=article"
+        - name: STORAGE_CONNECTIONSTRING_ENV_NAME
+          value: "DefaultEndpointsProtocol=https;AccountName=commonstagestorage00;AccountKey=DqG3xzEnePmJnF/mZ4Iso5JhbI+eWhXCVN4KsGDMWspO740gCwxWQwuNQ5OD83qci6tD9+GQaeG1qz5h/JBNDg==;EndpointSuffix=core.windows.net"
+        resources:
+          requests:
+            cpu: 6000m
+            memory: 3072M
+          limits:
+            cpu: 7000m
+            memory: 9216M
+        
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/aims/env
+        - name: data
+          mountPath: /usr/share/fonts/
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ig-font-pvc
+        - name: config-volume
+          configMap:
+            name: imagegenerator-configmap
+      terminationGracePeriodSeconds: 7260
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: imggenerator-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 9007
+        selector:
+          app: imggenerator
+
+---
+
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: imggenerator-deployment-hpa
+spec:
+  maxReplicas: 20 # define max replica count
+  minReplicas: 1  # define min replica count
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: imggenerator-deployment
+  targetCPUUtilizationPercentage: 20 # target CPU utilization

@@ -1,0 +1,95 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apiserviceaqp-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: apiserviceaqp   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: apiserviceaqp
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/api_aqp_img:3353   # The path of container 
+        name: apiserviceaqp   # Container name
+        ports:
+        - containerPort: 8181   # Port number
+        livenessProbe:
+          httpGet:
+            path: /api/v1/heartbeat
+            port: 8080
+            scheme: HTTP
+            httpHeaders:
+            - name: apiKey
+              value:  "AhaBOWah.oSmXBhSMIZKGxgRcWLmaJRtSALRnowlYoZB"
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 5
+        env:
+        - name: apiservice_release_date
+          value: "2022-06-30 11:49:08"
+        - name: apiservice_version_info
+          value: "3339"
+        - name: dashboard_release_date
+          value: "2022-07-04 12:39:48"
+        - name: dashboard_version_info
+          value: "3348"
+        - name: ld_release_date
+          value: "2022-05-30 04:20:20"
+        - name: ld_version_info
+          value: "3353"
+        - name: base_version_string
+          value: "1.1.2"
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 3072M
+          limits:
+            cpu: 1000m
+            memory: 3072M
+       
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/src/app/env
+      volumes:
+        - name: config-volume
+          configMap:
+            name: api-configmap
+      terminationGracePeriodSeconds: 1200
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: apiserviceaqp-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 8181
+        selector:
+          app: apiserviceaqp
+
+---
+
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: apiserviceaqp-deployment-hpa
+spec:
+  maxReplicas: 5 # define max replica count
+  minReplicas: 5 # define min replica count
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: apiserviceaqp-deployment
+  targetCPUUtilizationPercentage: 20 # target CPU utilization

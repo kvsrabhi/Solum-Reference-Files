@@ -1,0 +1,73 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: outbound-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: outbound   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: outbound
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/multitenant_outbound_img:2787  # The path of container 
+        name: outbound   # Container name
+        ports:
+        - containerPort: 9006   # Port number 
+        livenessProbe:
+          httpGet:
+            path: /outbound/api/v1/heartbeat
+            port: 9006
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 5
+        env:
+        - name: release_date
+          value: "2022-04-03 01:07:03"
+        - name: debug_enable
+          value: "false"
+        - name: base_version_string
+          value: "1.0.7"
+        - name: version_info
+          value: "2787"
+        - name: JAVA_OPTS
+          value: "-XX:+DisableAttachMechanism -Xms700m -Xmx1024m"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 2048M
+          limits:
+            cpu: 4000m
+            memory: 3072M
+        
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/aims/env
+      volumes:
+        - name: config-volume
+          configMap:
+            name: outbound-configmap
+      terminationGracePeriodSeconds: 70
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: outbound-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 9006
+        selector:
+          app: outbound

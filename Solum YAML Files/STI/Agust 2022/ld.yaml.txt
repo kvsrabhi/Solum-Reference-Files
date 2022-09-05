@@ -1,0 +1,72 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ld-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: ld   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: ld
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/common_ld_img:3592   # The path of container 
+        name: ld   # Container name
+        ports:
+        - containerPort: 8082   # Port number
+        
+        resources:
+          requests:
+              cpu: 1000m
+          limits:
+              cpu: 1000m
+
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/share/nginx/html/assets/app-config.json
+          subPath: app-config.json
+        - name: config-volume
+          mountPath: /usr/share/nginx/html/assets/properties.json
+          subPath: properties.json
+        - name: config-volume
+          mountPath: /usr/share/nginx/html/assets/azure-config.json
+          subPath: azure-config.json
+        - name: config-volume
+          mountPath: /usr/share/nginx/html/assets/fonts.css
+          subPath: fonts.css
+        - name: config-volume
+          mountPath: /usr/share/nginx/html/assets/font-family.json
+          subPath: font-family.json
+        - name: config-volume
+          mountPath: /usr/share/nginx/html/assets/font-family-added.json
+          subPath: font-family-added.json
+        
+        - name: data
+          mountPath: /usr/share/nginx/html/assets/fonts/
+      volumes:
+        - name: config-volume
+          configMap:
+            name: ld-configmap       
+        - name: data
+          persistentVolumeClaim:
+            claimName: ig-font-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: ld-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 8082
+        selector:
+          app: ld

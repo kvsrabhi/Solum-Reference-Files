@@ -1,0 +1,67 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ikea-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: ikea   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: ikea
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/common_ikea_converter_img:1920 # The path of container 
+        name: ikea   # Container name
+        ports:
+        - containerPort: 9009   # Port number 
+        livenessProbe:
+          httpGet:
+            path: /ikea-cs/api/v1/heartbeat
+            port: 9009
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 5
+        env:
+        - name: debug_enable
+          value: "true"
+        - name: base_version_string
+          value: "1.0.4"
+        - name: version_info
+          value: "1920"
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 1024M
+          limits:
+            cpu: 2000m
+            memory: 2048M
+        
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/aims/env
+      volumes:
+        - name: config-volume
+          configMap:
+            name: ikea-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: ikea-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 9009
+        selector:
+          app: ikea

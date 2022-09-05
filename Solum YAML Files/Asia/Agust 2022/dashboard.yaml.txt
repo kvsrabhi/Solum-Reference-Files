@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: dashboard   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: dashboard
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/template_levels_dashboard_img:3451 # The path of container
+        name: dashboard   # Container name
+        ports:
+        - containerPort: 80   # Port number
+
+        resources:
+          requests:
+              cpu: 1000m
+          limits:
+              cpu: 1000m
+
+        volumeMounts:
+        - name: config-volume
+          mountPath: /usr/local/tomcat/webapps/ROOT/azureConfig.js
+          subPath: azureConfig.js
+        - name: config-volume
+          mountPath: /usr/local/tomcat/webapps/ROOT/properties_cloud.json
+          subPath: properties_cloud.json
+      volumes:
+        - name: config-volume
+          configMap:
+            name: dashboard-configmap
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: dashboard-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 80
+        selector:
+          app: dashboard
