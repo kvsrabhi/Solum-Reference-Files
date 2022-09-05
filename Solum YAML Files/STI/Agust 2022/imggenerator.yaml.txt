@@ -1,0 +1,85 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imggenerator-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: imggenerator   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: imggenerator
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/common_ig_jdk16_img:3575  # The path of container 
+        name: imggenerator   # Container name
+        ports:
+        - containerPort: 9007   # Port number
+        livenessProbe:
+          httpGet:
+            path: /imagegenerator/api/v1/heartbeat
+            port: 9007
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 10
+        env:
+        - name: release_date
+          value: "2022-08-19 11:00:22"
+        - name: debug_enable
+          value: "true"
+        - name: minio_enable
+          value: "false"
+        - name: base_version_string
+          value: "1.0.6"
+        - name: version_info
+          value: "3575"
+        - name: JAVA_OPTS
+          value: "-XX:+DisableAttachMechanism -Xms500m -Xmx2048m -XX:MaxMetaspaceSize=200m"
+          #value: "-XX:+DisableAttachMechanism -Xms1048m -Xmx6500m -XX:MaxMetaspaceSize=800m"
+        - name: EVENTHUB_CONNECTIONSTRING_ENV_NAME
+          value: "Endpoint=sb://sti-stage-qa-eventhub.servicebus.windows.net/;SharedAccessKeyName=kea-read;SharedAccessKey=vhJJz04Ralg9TIy6sDeEwsu8DzBWXXzVSge5UEbTMxI=;EntityPath=article"
+        - name: STORAGE_CONNECTIONSTRING_ENV_NAME
+          value: "DefaultEndpointsProtocol=https;AccountName=stistageqastorage;AccountKey=OAuuOBt5DAIdUuXKH1avIjvR59uXIv/A6KqbPtm7QjnADERzERTRPQ0gKcsvdpS4V3+Dh3M4L7Wi3n124Caiww==;EndpointSuffix=core.windows.net"
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 2024M
+          limits:
+            cpu: 2000m
+            memory: 3072M
+        
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/aims/env
+        - name: data
+          mountPath: /usr/share/fonts/
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ig-font-pvc
+        - name: config-volume
+          configMap:
+            name: imagegenerator-configmap
+      terminationGracePeriodSeconds: 130 
+ 
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: imggenerator-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 9007
+        selector:
+          app: imggenerator

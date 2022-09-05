@@ -1,0 +1,68 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlinesw-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: onlinesw   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: onlinesw
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/common_online_sw_interface_img:924 # The path of container
+        name: onlinesw   # Container name
+        ports:
+        - containerPort: 8083   # Port number
+        livenessProbe:
+          httpGet:
+            path: /onlinesw/api/v1/heartbeat
+            port: 8083
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 5
+        env:
+        - name: app_insight_key
+          value: "8273df31-10f8-458a-9118-35eb2806f779"
+        - name: debug_enable
+          value: "false"
+        - name: base_version_string
+          value: "1.0.0"
+        - name: version_info
+          value: "924"
+        resources:
+          requests:
+            cpu: 2000m
+            memory: 1024M
+          limits:
+            cpu: 3000m
+            memory: 2048M
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/aims/env
+      volumes:
+        - name: config-volume
+          configMap:
+            name: onlinesw-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: onlinesw-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 8083
+        selector:
+          app: onlinesw

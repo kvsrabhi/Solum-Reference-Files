@@ -1,0 +1,99 @@
+resource "azurerm_resource_group" "rg" {
+        name = "seg-common-resource01"
+        location = var.location
+}
+resource "azurerm_eventhub_namespace" "seg-common-eventhub01" {
+  name                = "seg-common-eventhub01"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "Standard"
+  capacity            = 1
+  tags = {
+    environment = "seg-common"
+  }
+}
+resource "azurerm_eventhub" "seg-common-eventhub1" {
+  name                = "article"
+  namespace_name      = azurerm_eventhub_namespace.seg-common-eventhub01.name
+  resource_group_name = azurerm_resource_group.rg.name
+  partition_count     = 30
+  message_retention   = 1
+}
+resource "azurerm_eventhub" "seg-common-eventhub2" {
+  name                = "inbound"
+  namespace_name      = azurerm_eventhub_namespace.seg-common-eventhub01.name
+  resource_group_name = azurerm_resource_group.rg.name
+  partition_count     = 10
+  message_retention   = 1
+}
+resource "azurerm_eventhub" "seg-common-eventhub3" {
+  name                = "outbound"
+  namespace_name      = azurerm_eventhub_namespace.seg-common-eventhub01.name
+  resource_group_name = azurerm_resource_group.rg.name
+  partition_count     = 10
+  message_retention   = 1
+}
+resource "azurerm_eventhub" "seg-common-eventhub4" {
+  name                = "apiservice"
+  namespace_name      = azurerm_eventhub_namespace.seg-common-eventhub01.name
+  resource_group_name = azurerm_resource_group.rg.name
+  partition_count     = 10
+  message_retention   = 1
+}
+resource "azurerm_eventhub_authorization_rule" "authorization_rule" {
+  resource_group_name = azurerm_resource_group.rg.name
+  namespace_name      = azurerm_eventhub_namespace.seg-common-eventhub01.name
+  eventhub_name       = azurerm_eventhub.seg-common-eventhub2.name
+  name                = "acctest"
+  send                = true
+}
+resource "azurerm_storage_account" "segcommonstorage01" {
+  name                     = "segcommonstorage01"
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = azurerm_resource_group.rg.location
+  account_kind             = "BlockBlobStorage"
+  account_tier             = "Premium"
+  account_replication_type = "LRS"
+}
+resource "azurerm_storage_container" "seg-common-container1" {
+  name                  = "seg-common-article-eventhub-checkpoint"
+  storage_account_name  = azurerm_storage_account.segcommonstorage01.name
+  container_access_type = "private"
+# container_access_type = "blob"
+}
+resource "azurerm_storage_container" "seg-common-container2" {
+  name                  = "seg-common-inbound-eventhub-checkpoint"
+  storage_account_name  = azurerm_storage_account.segcommonstorage01.name
+  container_access_type = "private"
+}
+resource "azurerm_storage_container" "seg-common-container3" {
+  name                  = "seg-common-outbound-eventhub-checkpoint"
+  storage_account_name  = azurerm_storage_account.segcommonstorage01.name
+  container_access_type = "private"
+}
+resource "azurerm_storage_container" "seg-common-container4" {
+  name                  = "seg-common-apiservice-eventhub-checkpoint"
+  storage_account_name  = azurerm_storage_account.segcommonstorage01.name
+  container_access_type = "private"
+}
+resource "azurerm_iothub" "seg-common-iothub01" {
+  name                = "seg-common-iothub01"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  sku {
+    name     = "S1"
+    capacity = "1"
+  }
+  endpoint {
+    type                       = "AzureIotHub.EventHub"
+    name                       = "segcommoninboundstatusgw"
+    connection_string          = azurerm_eventhub_authorization_rule.authorization_rule.primary_connection_string
+  }
+  route {
+    name           = "segcommoninboundroute"
+    source         = "DeviceMessages"
+    condition      = true
+    endpoint_names = ["segcommoninboundstatusgw"]
+    enabled        = true
+  }
+}

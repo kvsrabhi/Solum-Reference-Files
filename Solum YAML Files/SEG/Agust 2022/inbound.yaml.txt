@@ -1,0 +1,72 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inbound-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 3   # The number of replicas
+  selector:
+    matchLabels:
+      app: inbound   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: inbound
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/multitenant_inbound_img:3293 # The path of container 
+        name: inbound   # Container name
+        ports:
+        - containerPort: 9005   # Port number 
+        livenessProbe:
+          httpGet:
+            path: /inbound/api/v1/heartbeat
+            port: 9005
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 5
+        env:
+        - name: release_date
+          value: "2022-07-03 00:30:50"
+        - name: debug_enable
+          value: "false"
+        - name: base_version_string
+          value: "1.1.2"
+        - name: version_info
+          value: "3293"
+        - name: JAVA_OPTS
+          value: "-XX:+DisableAttachMechanism -Xms700m -Xmx1024m"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 1500M
+          limits:
+            cpu: 4000m
+            memory: 3072M
+        
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/aims/env
+      volumes:
+        - name: config-volume
+          configMap:
+            name: inbound-configmap
+      terminationGracePeriodSeconds: 70
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: inbound-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 9005
+        selector:
+          app: inbound

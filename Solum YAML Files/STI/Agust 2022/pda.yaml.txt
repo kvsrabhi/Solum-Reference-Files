@@ -1,0 +1,62 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pda-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: pda   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: pda
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/pda_img:2587 # The path of container 
+        name: pda   # Container name
+        ports:
+        - containerPort: 8090   # Port number 
+        livenessProbe:
+          httpGet:
+            path: /PDA/api/v1/heartbeat
+            port: 8090
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 5
+        env:
+        - name: release_date
+          value: "2022-02-16 07:01:00"
+        - name: base_version_string
+          value: "1.0.6"
+        - name: version_info
+          value: "2587"
+        
+        volumeMounts:
+          - name: config-volume
+            mountPath: /opt/aims/env
+
+      volumes:
+        - name: config-volume
+          configMap:
+            name: pda-configmap
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: pda-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 8090
+        selector:
+          app: pda

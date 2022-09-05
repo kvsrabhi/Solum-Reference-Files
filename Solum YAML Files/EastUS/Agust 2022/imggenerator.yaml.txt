@@ -1,0 +1,93 @@
+# A. Basic items
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imggenerator-deployment
+
+# B. Deployment specification
+spec:
+  replicas: 1   # The number of replicas
+  selector:
+    matchLabels:
+      app: imggenerator   # template searching condition
+
+  # C. Pod template
+  template:
+    metadata:
+      labels:
+        app: imggenerator
+        env: stage
+    spec:
+      containers:
+      - image: solumacrms.azurecr.io/common_ig_jdk16_img:3262  # The path of container 
+        name: imggenerator   # Container name
+        ports:
+        - containerPort: 9007   # Port number
+        livenessProbe:
+          httpGet:
+            path: /imagegenerator/api/v1/heartbeat
+            port: 9007
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 10
+        env:
+        - name: release_date
+          value: "2022-07-08 00:30:43"
+        - name: debug_enable
+          value: "true"
+        - name: minio_enable
+          value: "false"
+        - name: base_version_string
+          value: "1.1.2"
+        - name: version_info
+          value: "3262"
+        - name: JAVA_OPTS
+          value: "-XX:+DisableAttachMechanism -XX:+PrintCommandLineFlags -XX:+UseG1GC -Xms1024m -Xmx4096m -XX:MaxMetaspaceSize=1024m"        resources:
+          requests:
+            cpu: 6000m
+            memory: 3072M
+          limits:
+            cpu: 7000m
+            memory: 9216M
+        
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/aims/env
+        - name: data
+          mountPath: /usr/share/fonts/
+      volumes:
+        - name: config-volume
+          configMap:
+            name: imagegenerator-configmap
+        - name: data
+          persistentVolumeClaim:
+            claimName: ig-font-pvc
+      terminationGracePeriodSeconds: 7260
+---
+apiVersion: v1
+kind: Service
+metadata:
+        name: imggenerator-deployment
+spec:
+        type: ClusterIP
+        ports:
+        - port: 9007
+        selector:
+          app: imggenerator
+
+---
+
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: imggenerator-deployment-hpa
+spec:
+  maxReplicas: 20 # define max replica count
+  minReplicas: 1  # define min replica count
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: imggenerator-deployment
+  targetCPUUtilizationPercentage: 20 # target CPU utilization
