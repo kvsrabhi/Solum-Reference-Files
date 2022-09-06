@@ -18,7 +18,6 @@ resource "azurerm_resource_group" "satrg" {
   location = "Korea Central"
 }
 
-# Create AKS Cluster
 resource "azurerm_kubernetes_cluster" "satakscluster" {
   name                = "solum-asset-tracker-akscluster"
   location            = azurerm_resource_group.satrg.location
@@ -50,8 +49,7 @@ output "kube_config" {
   sensitive = true
 }
 
-# Create Azure Storage Account
-resource "azurerm_storage_account" "satstorageaccount" {
+resource "azurerm_storage_account" "satstorage" {
   name                     = "satstorageaccount12345"
   resource_group_name      = azurerm_resource_group.satrg.name
   location                 = azurerm_resource_group.satrg.location
@@ -63,14 +61,12 @@ resource "azurerm_storage_account" "satstorageaccount" {
   }
 }
 
-# create Azure Storage Container
 resource "azurerm_storage_container" "satstoragecontainer" {
-  name                  = "sat-storage-container"
-  storage_account_name  = azurerm_storage_account.satstorageaccount.name
+  name                  = "sat-storage-container12345"
+  storage_account_name  = azurerm_storage_account.satstorage.name
   container_access_type = "private"
 }
 
-# Create Azure EventHub Namespace
 resource "azurerm_eventhub_namespace" "sateventhubnamespace" {
   name                = "sat-event-hub-namespace"
   location            = azurerm_resource_group.satrg.location
@@ -83,11 +79,10 @@ resource "azurerm_eventhub_namespace" "sateventhubnamespace" {
   }
 }
 
-# Create EventHub
 resource "azurerm_eventhub" "sateventhub" {
   name                = "sat-eventhub1"
   namespace_name      = azurerm_eventhub_namespace.sateventhubnamespace.name
   resource_group_name = azurerm_resource_group.satrg.name
-  partition_count     = 5
-  message_retention   = 7
+  partition_count     = 10
+  message_retention   = 2
 }
