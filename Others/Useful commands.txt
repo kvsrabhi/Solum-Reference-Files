@@ -1,0 +1,641 @@
+ZIP commands in Linux
+
+ZIP is a compression and file packaging utility for Unix. Each file is stored in single .zip {.zip-filename} file with the extension .zip.
+
+zip is used to compress the files to reduce file size and also used as file package utility. zip is available in many operating systems like unix, linux, windows etc.
+If you have a limited bandwidth between two servers and want to transfer the files faster, then zip the files and transfer.
+The zip program puts one or more compressed files into a single zip archive, along with information about the files (name, path, date, time of last modification, protection, and check information to verify file integrity). An entire directory structure can be packed into a zip archive with a single command.
+Compression ratios of 2:1 to 3:1 are common for text files. zip has one compression method (deflation) and can also store files without compression. zip automatically chooses the better of the two for each file to be compressed.
+The program is useful for packaging a set of files for distribution; for archiving files; and for saving disk space by temporarily compressing unused files or directories.
+Syntax :
+
+zip [options] zipfile files_list
+Syntax for  Creating a zip file:
+
+$zip myfile.zip filename.txt
+Extracting files from zip file 
+
+Unzip will list, test, or extract files from a ZIP archive, commonly found on Unix systems. The default behavior (with no options) is to extract into the current directory (and sub-directories below it) all files from the specified ZIP archive.
+
+Syntax :
+$unzip myfile.zip 
+Options :
+1. -d Option: Removes the file from the zip archive.  After creating a zip file, you can remove a file from the archive using the -d option.
+Suppose we have following files in my current directory are listed below:
+hello1.c
+hello2.c
+hello3.c
+hello4.c
+hello5.c
+hello6.c
+hello7.c
+hello8.c
+
+Syntax :
+
+$zip –d filename.zip file.txt
+Command :
+$zip –d myfile.zip hello7.c
+After removing hello7.c from myfile.zip file, the files can be restored with unzip command
+
+Command:
+$unzip myfile.zip
+$ls command
+Output :
+hello1.c
+hello2.c
+hello3.c
+hello4.c
+hello5.c
+hello6.c
+hello8.c
+The hello7.c file is removed from zip file
+2.-u Option: Updates the file in the zip archive. This option can be used to update the specified list of files or add new files to the existing zip file. Update an existing entry in the zip archive only if it has been modified more recently than the version already in the zip archive.
+Syntax:
+
+$zip –u filename.zip file.txt
+
+Suppose we have following files in my current directory are listed below:
+hello1.c
+hello2.c
+hello3.c
+hello4.c
+
+Command :
+$zip –u myfile.zip hello5.c
+After updating hello5.c from myfile.zip file, the files can be restored with unzip command
+
+Command:
+$unzip myfile.zip
+$ls command
+Output :
+hello1.c
+hello2.c
+hello3.c
+hello4.c
+hello5.c
+The hello5.c file is updated to the zip file
+3. -m Option: Deletes the original files after zipping. Move the specified files into the zip archive actually, this deletes the target directories/files after making the specified zip archive. If a directory becomes empty after removal of the files, the directory is also removed. No deletions are done until zip has created the archive without error. This is useful for conserving disk space, but is potentially dangerous removing all input files.
+Syntax :
+
+$zip –m filename.zip file.txt
+
+Suppose we have following files in my current directory are listed below:
+hello1.c
+hello2.c
+hello3.c
+hello4.c
+
+Command :
+$zip –m myfile.zip *.c
+After this command has been executed by the terminal here is the result:
+
+Command:
+$ls command
+Output :
+myfile.zip
+//No other files of .c(extension) has been found
+4.-r Option: To zip a directory recursively, use the -r option with the zip command and it will recursively zips the files in a directory. This option helps you to zip all the files present in the specified directory.
+
+Syntax:
+
+$zip –r filename.zip directory_name
+Suppose we have following files in my current directory (docs) are listed below:
+unix.pdf
+oracle.pdf
+linux.pdf
+
+Command :
+$zip –r mydir.zip docs
+Output :
+  adding: docs/            //Compressing the directory
+  adding: docs/unix.pdf   // Compressing first file
+  adding: docs/oracle.pdf // Compressing second file
+  adding: docs/linux.pdf  //Compressing third file
+5. -x Option: Exclude the files in creating the zip. Let say you are zipping all the files in the current directory and want to exclude some unwanted files. You can exclude these unwanted files using the -x option.
+
+Syntax :
+
+$zip –x filename.zip file_to_be_excluded
+
+Suppose we have following files in my current directory are listed below:
+hello1.c
+hello2.c
+hello3.c
+hello4.c
+
+Command :
+$zip –x myfile.zip hello3.c
+This command on execution will compress all the files except hello3.c
+
+Command:
+$ls command
+Output :
+myfile.zip //compressed file
+hello3.c   //this file has been excluded while compressing
+6.-v Option: Verbose mode or print diagnostic version info. Normally, when applied to real operations, this option enables the display of a progress indicator during compression and requests verbose diagnostic info about zip file structure oddities.
+When -v is the only command line argument, and either stdin or stdout is not redirected to a file, a diagnostic screen is printed. In addition to the help screen header with program name, version, and release date, some pointers to the Info-ZIP home and distribution sites are given. Then, it shows information about the target environment (compiler type and version, OS version, compilation date and the enabled optional features used to create the zip executable.
+
+Syntax :
+
+$zip –v filename.zip file1.txt
+
+Suppose we have following files in my current directory are listed below:
+hello1.c
+hello2.c
+hello3.c
+hello4.c
+
+Command
+$zip -v file1.zip *.c
+Output :
+adding: hello1.c    (in=0) (out=0) (stored 0%)
+  adding: hello2.c    (in=0) (out=0) (stored 0%)
+  adding: hello3.c    (in=0) (out=0) (stored 0%)
+  adding: hello4.c    (in=0) (out=0) (stored 0%)
+total bytes=0, compressed=0 -> 0% savings
+
+
+
+
+
+Copy Files and Directories
+The cp command will copy files and directories or copy multiple sources to a destination directory. The basic syntax of the cp command is:
+
+# cp [options] source destination
+cp <source> <destination>
+If you have multiple files/directories to be coped to a destination directory, use the below command syntax.
+
+# cp [options] source1 source2 [...] destination_directory
+Common options used with the cp command, include:
+-a – archive, never follow symbolic links, preserve links, copy directories recursively
+-f – if an existing destination file cannot be opened, remove it and try again
+-i – prompt before overwriting an existing file
+-r – copy directories recursively
+
+These examples show typical invocations of the cp command with descriptions of what they do.
+
+Example 1
+Copying a single file to a destination directory:
+
+$ cp data.txt /var/tmp/
+Example 2
+Copying multiple files to a destination directory:
+
+$ cp data.txt file.csv /var/tmp/
+Example 3
+Copying a directory (and it’s contents) recursively:
+
+$ cp -r /etc/ /var/tmp/backup/
+Moving Files and Directories
+The mv command will move or rename files or directories, or can move multiple sources (files and directories) to a destination directory. The basic syntax of the mv command is:
+
+# mv [options] source destination
+mv <source> <destination>
+To move multiple files/directories into a destination, use the below syntax.
+
+# mv [options] source1 source2 [...] destination
+Common options used with the mv command:
+-f – do not prompt before overwriting
+-i – prompt before overwrite
+-u – move only when the source file is newer than the destination file or when the destination file is missing
+
+Note: that if the destination exists, it will be overwritten unless the -i option is used.
+If a file or directory is moved to a new name within the same directory, it is effectively renamed. For example, this would rename a file from oldname to newname.
+
+$ mv -i oldname newname
+
+
+
+
+
+
+
+
+How to Remove Files and Directories Using Linux Command Line
+
+This tutorial, will show you how to use the rm, unlink, and rmdir commands to remove files and directories in Linux.
+
+How to Remove Files
+To remove (or delete) a file in Linux from the command line, use either the rm (remove) or unlink command.
+
+The unlink command allows you to remove only a single file, while with rm, you can remove multiple files at once.
+
+Be extra careful when removing files or directories, because once the file is deleted it cannot be easily recovered.
+
+To delete a single file, use the rm or unlink command followed by the file name:
+
+unlink filename
+Copy
+rm filename
+Copy
+If the file is write-protected, you will be prompted for confirmation, as shown below. To remove the file type y, and hit Enter. Otherwise, if the file is not write-protected, it will be deleted without prompting.
+
+ 
+rm: remove write-protected regular empty file 'filename'?Copy
+To delete multiple files at once, use the rm command followed by the file names separated by space.
+
+
+rm filename1 filename2 filename3
+Copy
+You can also use a wildcard (*) and regular expansions to match multiple files. For example, to remove all .pdf files in the current directory, use the following command:
+
+rm *.pdf
+Copy
+When using regular expansions, first list the files with the ls command so that you can see what files will be deleted before running the rm command.
+
+Use the rm with the -i option to confirm each file before deleting it:
+
+rm -i filename(s)
+Copy
+To remove files without prompting, even if the files are write-protected, pass the -f (force) option to the rm command:
+
+rm -f filename(s)
+Copy
+You can also combine rm options. For example, to remove all .txt files in the current directory without a prompt in verbose mode, use the following command:
+
+rm -fv *.txt
+Copy
+How to Remove Directories (Folders)
+In Linux, you can remove/delete directories with the rmdir and rm.
+
+
+rmdir is a command-line utility for deleting empty directories, while with rm you can remove directories and their contents recursively.
+
+To remove an empty directory, use either rmdir or rm -d followed by the directory name:
+
+rm -d dirname
+Copy
+rmdir dirname
+Copy
+To remove non-empty directories and all the files within them, use the rm command with the-r (recursive) option:
+
+rm -r dirname
+Copy
+If a directory or a file within the directory is write-protected, you will be prompted to confirm the deletion.
+
+
+To remove non-empty directories and all the files without being prompted, use rm with the -r (recursive) and -f options:
+
+rm -rf dirname
+Copy
+To remove multiple directories at once, use the rm -r command followed by the directory names separated by space.
+
+rm -r dirname1 dirname2 dirname3
+Copy
+Same as with files, you can also use a wildcard (*) and regular expansions to match multiple directories.
+
+Conclusion
+By now you should have a good understanding of how to use the Linux rm, rmdir and unlink commands and you should be able to safely remove files and directories from the command line.
+
+
+
+# sed command to replace 24th line with text "      - image: solumacrms.azurecr.io/template_levels_dashboard_img:4000 #The path of container"
+
+sed -i '24s%.*%      - image: solumacrms.azurecr.io/template_levels_dashboard_img:4000 #The path of container%' apiservice.yaml
+
+Sed C ommand in Linux/Unix with examples
+
+SED command in UNIX stands for stream editor and it can perform lots of functions on file like searching, find and replace, insertion or deletion. Though most common use of SED command in UNIX is for substitution or for find and replace. By using SED you can edit files even without opening them, which is much quicker way to find and replace something in file, than first opening that file in VI Editor and then changing it.
+
+SED is a powerful text stream editor. Can do insertion, deletion, search and replace(substitution).
+SED command in unix supports regular expression which allows it perform complex pattern matching.
+Syntax:
+
+sed OPTIONS... [SCRIPT] [INPUTFILE...] 
+Example:
+Consider the below text file as an input.
+
+$cat > geekfile.txt
+unix is great os. unix is opensource. unix is free os.
+learn operating system.
+unix linux which one you choose.
+unix is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful.
+Sample Commands
+
+Replacing or substituting string : Sed command is mostly used to replace the text in a file. The below simple sed command replaces the word “unix” with “linux” in the file.
+$sed 's/unix/linux/' geekfile.txt
+Output :
+
+linux is great os. unix is opensource. unix is free os.
+learn operating system.
+linux linux which one you choose.
+linux is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful.
+Here the “s” specifies the substitution operation. The “/” are delimiters. The “unix” is the search pattern and the “linux” is the replacement string.
+
+By default, the sed command replaces the first occurrence of the pattern in each line and it won’t replace the second, third…occurrence in the line.
+
+Replacing the nth occurrence of a pattern in a line : Use the /1, /2 etc flags to replace the first, second occurrence of a pattern in a line. The below command replaces the second occurrence of the word “unix” with “linux” in a line.
+$sed 's/unix/linux/2' geekfile.txt
+Output:
+
+unix is great os. linux is opensource. unix is free os.
+learn operating system.
+unix linux which one you choose.
+unix is easy to learn.linux is a multiuser os.Learn unix .unix is a powerful.
+Replacing all the occurrence of the pattern in a line : The substitute flag /g (global replacement) specifies the sed command to replace all the occurrences of the string in the line.
+$sed 's/unix/linux/g' geekfile.txt
+Output :
+
+linux is great os. linux is opensource. linux is free os.
+learn operating system.
+linux linux which one you choose.
+linux is easy to learn.linux is a multiuser os.Learn linux .linux is a powerful.
+Replacing from nth occurrence to all occurrences in a line : Use the combination of /1, /2 etc and /g to replace all the patterns from the nth occurrence of a pattern in a line. The following sed command replaces the third, fourth, fifth… “unix” word with “linux” word in a line.
+$sed 's/unix/linux/3g' geekfile.txt
+Output:
+
+unix is great os. unix is opensource. linux is free os.
+learn operating system.
+unix linux which one you choose.
+unix is easy to learn.unix is a multiuser os.Learn linux .linux is a powerful.
+Parenthesize first character of each word : This sed example prints the first character of every word in parenthesis.
+$ echo "Welcome To The Geek Stuff" | sed 's/\(\b[A-Z]\)/\(\1\)/g'
+Output:
+
+(W)elcome (T)o (T)he (G)eek (S)tuff
+Replacing string on a specific line number : You can restrict the sed command to replace the string on a specific line number. An example is
+$sed '3 s/unix/linux/' geekfile.txt
+Output:
+
+unix is great os. unix is opensource. unix is free os.
+learn operating system.
+linux linux which one you choose.
+unix is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful.
+The above sed command replaces the string only on the third line.
+
+Duplicating the replaced line with /p flag : The /p print flag prints the replaced line twice on the terminal. If a line does not have the search pattern and is not replaced, then the /p prints that line only once.
+$sed 's/unix/linux/p' geekfile.txt
+Output:
+
+linux is great os. unix is opensource. unix is free os.
+linux is great os. unix is opensource. unix is free os.
+learn operating system.
+linux linux which one you choose.
+linux linux which one you choose.
+linux is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful.
+linux is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful.
+Printing only the replaced lines : Use the -n option along with the /p print flag to display only the replaced lines. Here the -n option suppresses the duplicate rows generated by the /p flag and prints the replaced lines only one time.
+$sed -n 's/unix/linux/p' geekfile.txt
+Output:
+
+linux is great os. unix is opensource. unix is free os.
+linux linux which one you choose.
+linux is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful.
+If you use -n alone without /p, then the sed does not print anything.
+
+Replacing string on a range of lines : You can specify a range of line numbers to the sed command for replacing a string.
+$sed '1,3 s/unix/linux/' geekfile.txt
+Output:
+
+linux is great os. unix is opensource. unix is free os.
+learn operating system.
+linux linux which one you choose.
+unix is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful.
+Here the sed command replaces the lines with range from 1 to 3. Another example is
+
+$sed '2,$ s/unix/linux/' geekfile.txt
+Output:
+
+unix is great os. unix is opensource. unix is free os.
+learn operating system.
+linux linux which one you choose.
+linux is easy to learn.unix is a multiuser os.Learn unix .unix is a powerful
+Here $ indicates the last line in the file. So the sed command replaces the text from second line to last line in the file.
+
+Deleting lines from a particular file : SED command can also be used for deleting lines from a particular file. SED command is used for performing deletion operation without even opening the file
+Examples:
+1. To Delete a particular line say n in this example
+Syntax:
+$ sed 'nd' filename.txt
+Example:
+$ sed '5d' filename.txt
+2. To Delete a last line
+
+Syntax:
+$ sed '$d' filename.txt
+3. To Delete line from range x to y
+
+Syntax:
+$ sed 'x,yd' filename.txt
+Example:
+$ sed '3,6d' filename.txt
+4. To Delete from nth to last line
+
+Syntax:
+$ sed 'nth,$d' filename.txt
+Example:
+$ sed '12,$d' filename.txt
+5. To Delete pattern matching line
+
+Syntax:
+$ sed '/pattern/d' filename.txt
+Example:
+$ sed '/abc/d' filename.txt
+
+
+
+First create a.txt file on which I am going to perform operations for SED commands. In this blog, I used “a.txt” file to explain all the examples. Blog will become too long if i write the output of each sed command. So, you may refer the same file to practice all the commands initially.  
+
+[root@rhel7 ~]# cat a.txt
+life isn't meant to be easy, life is meant to be lived.
+Try to learn & understand something new everyday in life.
+Respect everyone & most important love everyone.
+Don’t hesitate to ask for love & don’t hesitate to show love too.
+Life is too short to be shy.
+In life, experience will help you differentiating right from wrong.
+# Let’s start with File Spacing 
+1 – Insert one blank line after each line –  
+
+[root@rhel7 ~]# sed G a.txt 
+sed-output
+
+2 – To insert two blank lines –  
+
+[root@rhel7 ~]# sed 'G;G' a.txt
+3 – Delete blank lines and insert one blank line after each line –  
+
+[root@rhel7 ~]# sed '/^$/d;G' a.txt
+4 – Insert a black line above every line which matches “love” –  
+
+[root@rhel7 ~]# sed '/love/{x;p;x;}' a.txt
+5 – Insert a blank line below every line which matches “love” –  
+
+[root@rhel7 ~]# sed '/love/G' a.txt
+6 – Insert 5 spaces to the left of every lines –  
+
+[root@rhel7 ~]# sed 's/^/     /' a.txt
+# Numbering lines 
+1 – Number each line of a file (left alignment). **=** is used to number the line. \t is used for tab between number and sentence – 
+
+[root@rhel7 ~]# sed =  a.txt | sed 'N;s/\n/\t/'
+2 – Number each line of a file (number on left, right-aligned). This command is similar to `cat -n filename`. 
+
+[root@rhel7 ~]# sed = a.txt | sed 'N; s/^/     /; s/ *\(.\{4,\}\)\n/\1  /'
+3 – Number each line of file, only if line is not blank –  
+
+[root@rhel7 ~]#  sed '/./=' a.txt | sed '/./N; s/\n/ /'
+# Deleting lines 
+1 – Delete a particular line – 
+Syntax: sed ‘nd’ filename 
+Example :  
+
+[root@rhel7 ~]# sed '5d' a.txt
+2 – Delete the last line 
+Syntax: sed ‘$d’ filename 
+
+3 – Delete line from range x to y 
+Syntax: sed ‘x,yd’ filename 
+Example :  
+
+[root@rhel7 ~]# sed '3,5d' a.txt
+4 – Delete from nth to last line 
+Syntax: sed ‘nth,$d’ filename 
+Example : 
+
+[root@rhel7 ~]# sed '2,$d' a.txt
+5 – Delete the pattern matching line – 
+Syntax: sed ‘/pattern/d’ filename 
+Example :  
+
+[root@rhel7 ~]# sed '/life/d' a.txt
+6 – Delete lines starting from nth line and every 2nd line from there – 
+Syntax: sed ‘n~2d’ filename 
+Example :  
+
+[root@rhel7 ~]# sed '3~2d' a.txt
+7 – Delete the lines which matches the pattern and 2 lines after to that – 
+Syntax: sed ‘/pattern/,+2d’ filename 
+Example :  
+
+[root@rhel7 ~]# sed '/easy/,+2d' a.txt
+8 – Delete blank Lines  
+
+[root@rhel7 ~]# sed '/^$/d' a.txt
+9 – Delete empty lines or those begins with “#” –  
+
+[root@rhel7 ~]# sed -i '/^#/d;/^$/d' a.txt
+# View/Print the files 
+If we want to view content of file, then we use cat command and if we want to view the bottom and the top content of any file, we use tools such as head and tail. But what if we need to view a particular section in the middle of any file? Here we’ll discuss, how to use SED command to view a section of any file. 
+
+1 – Viewing a file from x to y range – 
+Syntax: sed -n ‘x,yp’ filename 
+Example : 
+
+[root@rhel7 ~]# sed -n '2,5p' a.txt
+2 – View the entire file except the given range – 
+Syntax: sed ‘x,yd’ filename 
+Example :  
+
+[root@rhel7 ~]# sed '2,4d' a.txt
+3 – Print nth line of the file – 
+Syntax: sed -n ‘address’p filename 
+Example :  
+
+[root@rhel7 ~]# sed -n '4'p a.txt
+4 – Print lines from xth line to yth line. 
+Syntax: sed -n ‘x,y’p filename 
+Example :  
+
+[root@rhel7 ~]# sed -n '4,6'p a.txt
+5 – Print only the last line – 
+Syntax: sed -n ‘$’p filename 
+
+6 – Print from nth line to end of file – 
+Syntax: sed -n ‘n,$p’ filename 
+Example : 
+
+[root@rhel7 ~]# sed -n '3,$'p a.txt
+Pattern Printing 
+7 – Print the line only which matches the pattern – 
+Syntax: sed -n /pattern/p filename 
+Example : 
+
+[root@rhel7 ~]# sed -n /every/p a.txt
+8 – Print lines which matches the pattern i.e from input to xth line. 
+Syntax: sed -n ‘/pattern/,xp’ filename 
+Example :  
+
+[root@rhel7 ~]# sed -n '/everyone/,5p' a.txt
+Following prints lines which matches the pattern, 3rd line matches the pattern “everyone”, so it prints from 3rd line to 5th line. Use $ in place of 5, if want to print the file till end. 
+
+9 – Prints lines from the xth line of the input, up-to the line which matches the pattern. If the pattern doesn’t found then it prints up-to end of the file. 
+Syntax: sed -n ‘x,/pattern/p’ filename 
+Example : 
+
+sed -n '1,/everyone/p' a.txt
+10 – Print the lines which matches the pattern up-to the next xth lines – 
+Syntax: sed -n ‘/pattern/,+xp’ filename 
+Example :  
+
+sed -n '/learn/,+2p' a.txt
+# Replacement with the sed command 
+1 – Change the first occurrence of the pattern – 
+
+[root@rhel7 ~]# sed 's/life/leaves/' a.txt
+2 – Replacing the nth occurrence of a pattern in a line – 
+Syntax: sed ‘s/old_pattern/new_pattern/n’ filename 
+Example :  
+
+[root@rhel7 ~]# sed 's/to/two/2' a.txt
+We wrote “2” because we replaces the second occurrence. Likewise you can use 3, 4 etc according to need. 
+
+3 – Replacing all the occurrence of the pattern in a line.  
+
+[root@rhel7 ~]# sed 's/life/learn/g' a.txt
+4 – Replace pattern from nth occurrence to all occurrences in a line. 
+Syntax: sed ‘s/old_pattern/new_pattern/ng’ filename 
+Example :  
+
+[root@rhel7 ~]# sed 's/to/TWO/2g' a.txt
+Note – This sed command replaces the second, third, etc occurrences of pattern “to” with “TWO” in a line. 
+
+If you wish to print only the replaced lines, then use “-n” option along with “/p” print flag to display only the replaced lines – 
+
+[root@rhel7 ~]# sed -n 's/to/TWO/p' a.txt
+And if you wish to print the replaced lines twice, then only use “/p” print flag without “-n” option-  
+
+[root@rhel7 ~]# sed 's/to/TWO/p' a.txt
+5 – Replacing pattern on a specific line number. Here, “m” is the line number. 
+Syntax: sed ‘m s/old_pattern/new_pattern/’ filename 
+Example :  
+
+[root@rhel7 ~]# sed '3 s/every/each/' a.txt
+If you wish to print only the replaced lines –  
+
+[root@rhel7 ~]# sed -n '3 s/every/each/p' a.txt
+6 – Replace string on a defined range of lines – 
+Syntax: sed ‘x,y s/old_pattern/new_pattern/’ filename 
+where, 
+x = starting line number 
+and y = ending line number 
+
+Example : 
+
+[root@rhel7 ~]# sed '2,5 s/to/TWO/' a.txt
+Note – $ can be used in place of “y” if we wish to change the pattern up-to last line in the file. 
+Example :  
+
+[root@rhel7 ~]# sed '2,$ s/to/TWO/' a.txt
+7 – If you wish to replace pattern in order to ignore character case (beginning with uppercase or lowercase), then there are two ways to replace such patterns – 
+First, By using “/i” print flag – 
+Syntax: sed ‘s/old_pattern/new_pattern/i’ filename 
+Example :  
+
+[root@rhel7 ~]# sed 's/life/Love/i' a.txt
+Second, By using regular expressions –  
+
+[root@rhel7 ~]# sed 's/[Ll]ife/Love/g' a.txt
+8 – To replace multiple spaces with a single space –  
+
+[root@rhel7 clang]# sed 's/  */ /g' filename
+9 – Replace one pattern followed by the another pattern – 
+Syntax: sed ‘/followed_pattern/ s/old_pattern/new_pattern/’ filename 
+Example :  
+
+[root@rhel7 ~]# sed '/is/ s/live/love/' a.txt
+10 – Replace a pattern with other except in the nth line. 
+Syntax: sed ‘n!s/old_pattern/new_pattern/’ filename 
+Example :  
+
+[root@rhel7 ~]# sed -i '5!s/life/love/' a.txt

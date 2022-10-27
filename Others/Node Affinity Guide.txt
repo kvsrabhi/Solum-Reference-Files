@@ -1,0 +1,179 @@
+Certified Kubernetes Administrator
+***********************************
+
+Description:
+***********
+In this video, you are going to learn the concepts of Scheduling pods to nodes using Node Affinity and we are also going to see a demo on the same as well.
+
+Scheduling Pods to Nodes using NodeAffinity:
+--------------------------------------------------------------------------
+
+1. Scheduling Pods to Nodes using “Node Affinity”
+2. Scheduling Pods to Nodes Using Labels
+3. Recap - NodeSelector
+4. Node Affinity 
+5. Types of Node Affinity
+6. Use Cases
+7. DEMO: Scheduling Pods to Nodes using “Node Affinity” 
+8. Thank you
+
+For suggestions/feedback/doubts contact 
+email: kvk@vsparkz.com
+
+Happy Learning !!!
+
+========================================================================================
+
+USEFUL LINKS:
+**************
+
+Assigning Pods to Nodes:
+------------------------------------------
+
+https://kubernetes.io/docs/concepts/s...
+
+Assigning Pods to Nodes using Node Affinity:
+-------------------------------------------------------------------------
+
+https://kubernetes.io/docs/concepts/s...
+
+API References:
+--------------------------
+
+https://kubernetes.io/docs/reference/...
+
+Kubectl Command Reference:
+------------------------------------------------
+
+https://kubernetes.io/docs/reference/...
+
+==========================================================================================
+#cka #kubernetes #k8s #containers
+
+
+DEMO STEPS:
+*************
+
+Step 1: Access & Inspect the Kubernetes Cluster
+------------------------------------------------------------------------------
+$ kubectl cluster-info
+
+$ kubectl get nodes 
+
+$ kubectl get pods -n kube-system
+
+Step 2: Add custom labels to the Nodes
+----------------------------------------------------------------
+
+$ kubectl label nodes worker01.vsparkz.com webserver=nginx workertype=python size=small
+
+$ kubectl label nodes worker02.vsparkz.com webserver=apache workertype=python size=large
+
+Step 3: Create & Schedule a Pod using “Required” Affinity Type
+-----------------------------------------------------------------------------------------------------
+
+$ kubectl run nginx --image=nginx --dry-run=client -o yaml
+
+Copy the output content and create a file - schedule_using_required.yaml
+
+$ vi schedule_using_required.yaml
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions: 
+          - key: webserver
+            operator: In
+            values:
+            - nginx
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+
+$ kubectl apply -f schedule_using_required.yaml
+
+$ kubectl get pods -o wide
+
+
+Step 4: Create & Schedule a Pod using “Preferred” Affinity Type 
+------------------------------------------------------------------------------------------------------
+
+$ vi schedule_using_preferred.yaml
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+  affinity:
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 10
+          preference:
+            matchExpressions:
+            - key: size
+              operator: In
+              values:
+              - large
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+$ kubectl apply -f schedule_using_preferred.yaml
+
+
+Step 5: Create & Schedule a Pod using both “required” & “preferred” Affinity Type 
+------------------------------------------------------------------------------------------------------------
+
+$ vi schedule_using_both.yaml
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - image: nginx
+    name: nginx
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions: 
+          - key: workertype
+            operator: In
+            values:
+            - python
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 20
+        preference:
+          matchExpressions:
+          - key: size
+            operator: In
+            values:
+            - large
+
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+$ kubectl apply -f schedule_using_both.yaml
+
+$ kubectl get pods -o wide
+
+========================================================================================================================

@@ -1,0 +1,168 @@
+1. Command to deploy a yaml.
+
+	kubectl apply -f xxxxxxxx.yaml
+	
+2. Command to delete a deployment.
+
+	kubectl delete -f xxxxxxx.yaml
+	
+3. Command to check all pods running fine or not?
+
+	kubectl get pods
+	kubectl get all
+	
+4. Command to know details of a pod.
+
+	kubectl get service xxxxxxxxx-deployment --watch
+
+5. Command to check resource utilization by each MS.
+
+	watch kubectl top pod
+	kubectl exec -it pod/imggenerator-deployment-5df656fb8-hlskz top
+	
+6. Command to check logs of a specific deployment (User must install 'kubetail' utility).
+
+	./kubetail xxxxxxxxx-deployment
+	
+7. Command to know the reason, if a specific deployment status is 'Pending' instead of 'Running'.
+
+	kubectl get pod xxxxxxxx-deployment-5fdb5948c7-nm78p --output=yaml
+	
+8. Command to login inside a specific pod already deployed successfully (Please specify the proper SHELL: /bin/bash  or /bin/sh).
+
+	kubectl exec -it pod/imggenerator-deployment-fd87c4589-4rc2n -- /bin/bash
+	kubectl exec -it pod/lbs-deployment-84fd5db554-4549k -- /bin/sh
+	
+9. Command to copy logs from a specific pod to local VM's path (/home/sti/log/) without logging inside.
+
+	kubectl cp default/apiservicewow-deployment-5f878d7c55-dd8t2:/usr/src/app/log /home/sti/log/
+	kubectl cp default/inbound-deployment-5858596b66-9sg4q:/opt/aims/log /home/sti/log/
+	kubectl cp default/outbound-deployment-784d79457b-ch2hp:/opt/aims/log /home/sti/log/
+	kubectl cp default/imggenerator-deployment-7b6b8bcbc-w58s9:/opt/aims/log /home/sti/log/
+	kubectl cp default/pda-deployment-7b6b8bcbc-w58s9:/usr/local/tomcat/log /home/sti/log/
+	
+10. Command to know public IP of a specific ASK cluster.
+
+	az network public-ip list -g MC_sti-stage-qa_sti-stage-qa-akscluster_koreacentral --subscription solumesl01
+	az network public-ip list -g MC_wow-stage-resource_wow-stage-aks01_australiaeast --subscription solumesl01
+	az network public-ip list -g MC_wow-stage-resource_wow-stage-aks02_australiaeast --subscription solumesl01
+	
+11. Command to know all nodes running in current AKS cluster.
+
+	kubectl get nodes -o wide
+	
+12. Command list all node pools (system and user) in current AKS cluster.
+
+	az aks nodepool list --resource-group slm-dev-rsc --cluster-name dev-stage-aks00 --subscription solumesl01
+	
+13. Command create an user node pool in current AKS cluster.
+
+	az aks nodepool add --resource-group slm-dev-rsc --cluster-name dev-stage-aks00 --name cluster1n0 --node-count 1 --node-vm-size Standard_D16_v3 --subscription solumesl01
+	
+14. Command delete an user node pool in current AKS cluster.
+
+	az aks nodepool delete -g slm-dev-rsc --cluster-name dev-stage-aks00 --name cluster1n0 --no-wait --subscription solumesl01
+	
+15. Command to enable horizontal scaling in an existing user node pool.
+
+	 az aks nodepool update --enable-cluster-autoscaler --resource-group wow-stage-resource --cluster-name wow-stage-aks00 --name cluster1n0 --min-count 1 --max-count 3 --subscription solumesl01
+
+16. Command to update an existing user node pool.
+
+	az aks nodepool update --update-cluster-autoscaler --resource-group wow-stage-resource --cluster-name wow-stage-aks00 --name cluster1n0 --min-count 1 --max-count 5 --subscription solumesl01
+	az aks nodepool update --update-cluster-autoscaler --resource-group seg-demo-resource1 --cluster-name seg-demo-aks --name cluster1n0 --min-count 3 --max-count 16 --subscription solumesl03
+
+17. Command to disable horizontal scaling in an existing user node pool.
+
+	az aks nodepool update --disable-cluster-autoscaler --resource-group solumAKSGroup --cluster-name wow-stage-aks00 --name cluster1n0
+	
+18. Command to see all AKS configmaps.
+	
+	kubectl get configmaps
+	
+19. Command to do a quick edit in a specific configmaps.
+
+	kubectl edit configmap inbound-configmap
+	
+20. Command to check a specific configmap's content in readonly mode.
+
+	kubectl get configmaps inbound-configmap -o yaml
+	
+21. Command to capture all logs of a specific pod so far in teraterm.
+	
+	kubectl logs --namespace default pda-deployment-787b6bc48b-p8568
+	
+22.  Command to check/updgrade AKS version.
+	
+	az aks get-versions --output table --subscription solumesl01 --location australiaeast
+	az aks show --resource-group wow-stage-resource --name wow-stage-aks00 --output table --subscription solumesl01
+	az aks get-upgrades --resource-group wow-stage-resource --name wow-stage-aks00 --output table --subscription solumesl01
+	az aks upgrade --resource-group wow-stage-resource --name wow-stage-aks00  --kubernetes-version 1.17.11 --subscription solumesl01
+	az aks upgrade --resource-group wow-stage-resource --name wow-stage-aks00  --kubernetes-version 1.18.8 --subscription solumesl01
+	
+	In case of Error during upgrade: ['Operation failed with status: 'Bad Request'. Details: Unable to retrieve log analytics workspace']. Try below command
+	az aks disable-addons -a monitoring --resource-group wow-stage-resource --name wow-stage-aks00 --subscription solumesl01
+	
+23. Command to know details of 'nginx-ingress-controller' .
+
+	kubectl describe service nginx-ingress-controller
+	
+24. Command to enable/disable monitoring for a specific AKS.
+
+	az aks enable-addons -a monitoring -n wow-stage-aks00 -g wow-stage-resource --subscription solumesl01
+	az aks disable-addons -a monitoring -n wow-stage-aks00 -g wow-stage-resource --subscription solumesl01
+
+25. Command to get entire pods in AKS cluster (system level & user level)
+	
+	kubectl get pods --all-namespaces
+	kubectl get pod,daemonset,replicaset,service --all-namespaces
+
+---------------------ACR Commands----------------------
+26. Command to login to a specific azure subscription.
+
+	az login -u admin@solumpro1.onmicrosoft.com -p xxxxxxx
+
+27. Command to check ACR ussage (storage in bytes - total limit size and current used size).
+	
+	az acr show-usage --subscription solumpro1 --resource-group solumAKSGroup --name solumACRms
+	
+28. Command to purge unused images from ACR repo.
+
+	PURGE_IMAGE="acr purge --filter 'pda_img:.*' --untagged --ago 2d --dry-run"
+	az acr run --cmd "$PURGE_IMAGE" --registry solumACRms --subscription solumpro1 --resource-group solumAKSGroup /dev/null
+	
+29. Azure Cloud Shell command to enable Host Caching on VM's Data Disk (0: data disk1 , 1: data disk2, etc)
+	az vm update -n asia-entity-db-01 -g ASIA_PROD_RESOURCE1 --disk-caching 0=ReadOnly --subscription solumesl04
+	
+30. "Node affinity" and "Taint & Tolerations" settings
+	
+	# user node pool
+	az aks nodepool list --resource-group common-stage-resource --cluster-name common-stage-aks00 --subscription solumesl01
+	az aks nodepool add --resource-group common-stage-resource --cluster-name common-stage-aks00 --name cluster1n0 --node-count 2 --node-vm-size Standard_F16s_v2 --subscription solumesl01
+	az aks nodepool update --enable-cluster-autoscaler --resource-group common-stage-resource --cluster-name common-stage-aks00 --name cluster1n0 --min-count 2 --max-count 16 --subscription solumesl01
+
+	# taint one of the node and label the node for node affinity. Finally add node affinity and tolerations inside specific pod's yaml
+	kubectl label nodes aks-cluster1n0-18470669-vmss000000 nodePool=apiservicenode
+	kubectl taint nodes aks-cluster1n0-18470669-vmss000000 app=frontend:NoExecute
+	
+	#remove existing label from node
+	kubectl label nodes aks-cluster1n0-09534252-vmss000000 nodePool-
+
+	# elastic node pool creation and tainting the entire node pool
+	az aks nodepool add --resource-group common-stage-resource --cluster-name common-stage-aks00 --name elasticpool --node-count 3 --node-vm-size Standard_B4ms --node-taints "efk=elastic:NoExecute" --subscription solumesl01
+	az aks nodepool add --resource-group common-stage-resource --cluster-name common-stage-aks00 --name elasticpool --node-count 3 --node-vm-size Standard_F8s_v2 --node-taints "efk=elastic:NoExecute" --subscription solumesl01
+	kubectl label nodes aks-elasticpool-35579264-vmss000000 aks-elasticpool-35579264-vmss000001 aks-elasticpool-35579264-vmss000002 nodePool=elastic
+
+
+31.   # pod force delete
+	kubectl delete pod <Pod_Name>
+	kubectl delete pod <Pod_Name> -n <namespace_name>  --grace-period=0  --force
+
+	kubectl delete pod/data-server-backend-deployment-8d79c8766-vqg2j -n default  --grace-period=0  --force
+
+32. 	# To check logs of a Pod
+	kubectl logs pod/data-server-backend-deployment-8d79c8766-vqg2j -f
+	kubectl logs pod <Pod_Name> -f
+      
+33. 	# To Delete (restart based on replica) a pod from YAML file
+	kubectl delete -f file.yaml --grace-period 0 --force

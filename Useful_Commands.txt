@@ -1,0 +1,54 @@
+1. Command to delete all pods with Status "OutOfCPU": kubectl get pods | grep OutOfcpu | awk '{print $1}' | xargs kubectl delete pod --force --grace-period=0
+2. Few AKS commands:
+	# user node pool
+	az aks nodepool list --resource-group common-stage-resource --cluster-name common-stage-aks00 --subscription solumesl01
+	az aks nodepool add --resource-group common-stage-resource --cluster-name common-stage-aks00 --name cluster1n0 --node-count 2 --node-vm-size Standard_F16s_v2 --subscription solumesl01
+	az aks nodepool update --enable-cluster-autoscaler --resource-group common-stage-resource --cluster-name common-stage-aks00 --name cluster1n0 --min-count 2 --max-count 16 --subscription solumesl01
+	kubectl label nodes aks-cluster1n0-18470669-vmss000000 nodePool=apiservicenode
+	kubectl taint nodes aks-cluster1n0-18470669-vmss000000 app=frontend:NoExecute
+	# elastic node pool
+	az aks nodepool add --resource-group common-stage-resource --cluster-name common-stage-aks00 --name elasticpool --node-count 3 --node-vm-size Standard_B4ms --node-taints "efk=elastic:NoExecute" --subscription solumesl01
+	kubectl label nodes aks-elasticpool-35579264-vmss000000 aks-elasticpool-35579264-vmss000001 aks-elasticpool-35579264-vmss000002 nodePool=elastic 
+3. command to get pod details in the namespace kube-logging: kubectl get pods -o wide --namespace=kube-logging
+4. Command to Update loss data in kibana using devtools:
+		POST _cluster/reroute?pretty
+		{
+		    "commands" : [
+		        {
+		          "allocate_empty_primary" : {
+		                "index" : "logstash-2022.08.05", 
+		                "shard" : 0,
+		                "node" : "es-cluster-2", 
+		                "accept_data_loss" : "true"
+		          }
+		        }
+		    ]
+		}
+
+
+5. Command to delete pod forcefully: kubectl delete pod <Pod_Name> -n <namespace_name>  --grace-period=0  --force
+6. list of Commands to save command outcome of Linux Terminal to a file
+
+		          || visible in terminal ||   visible in file   || existing
+		  Syntax  ||  StdOut  |  StdErr  ||  StdOut  |  StdErr  ||   file   
+		==========++==========+==========++==========+==========++===========
+		    >     ||    no    |   yes    ||   yes    |    no    || overwrite
+		    >>    ||    no    |   yes    ||   yes    |    no    ||  append
+		          ||          |          ||          |          ||
+		   2>     ||   yes    |    no    ||    no    |   yes    || overwrite
+		   2>>    ||   yes    |    no    ||    no    |   yes    ||  append
+		          ||          |          ||          |          ||
+		   &>     ||    no    |    no    ||   yes    |   yes    || overwrite
+		   &>>    ||    no    |    no    ||   yes    |   yes    ||  append
+		          ||          |          ||          |          ||
+		 | tee    ||   yes    |   yes    ||   yes    |    no    || overwrite
+		 | tee -a ||   yes    |   yes    ||   yes    |    no    ||  append
+		          ||          |          ||          |          ||
+		 n.e. (*) ||   yes    |   yes    ||    no    |   yes    || overwrite
+		 n.e. (*) ||   yes    |   yes    ||    no    |   yes    ||  append
+		          ||          |          ||          |          ||
+		|& tee    ||   yes    |   yes    ||   yes    |   yes    || overwrite
+		|& tee -a ||   yes    |   yes    ||   yes    |   yes    ||  append
+7. Git command to save credentials: git config --global credential.helper store
+8. Move Command: mv /home/seg/kclogs.txt /home/seg/vidyasagar/kclogs/07102022.txt
+9. Command to print text in red color: echo -e "\033[31mthis is in red color\033[0m"

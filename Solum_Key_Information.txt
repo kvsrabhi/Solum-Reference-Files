@@ -1,0 +1,55 @@
+1. Mircosoft Account: vidyasagar.k@solumpro1.onmicrosoft.com
+2. Solum Devops: https://dev.azure.com/solumesldevops
+3. Asset_Tracker URL: 	https://asia.asset.solumesl.com/ 
+			 	https://asia.asset.solumesl.com/az/api/v1/version
+4. Brity Mail: https://solu-m.britymail.com/portal/exdefault.jsp
+5. Rancher Login Credentials: https://52.231.53.34/ admin/SoluM201509!
+6. Solum Kibana: 
+		kibana Admin Login: elastic/solum@062021
+		https://stage00.common.solumesl.com/kb			common/solum@31012022
+		https://eu.common.solumesl.com/kb 				seg/solum@31012022
+		https://eastus.common.solumesl.com/kb 			eastus/solum@31012022
+		https://kr.common.solumesl.com/kb 				asia/solum@31012022
+		https://sqa.sti.solumesl.com/kb				sti/solum@31012022
+7. Login credentials to solumesl dashboard check: http://eastus.common.solumesl.com/ esldashboard@outlook.com /SoluM@2020 
+8. Solum Mail ID: vidyasagar.k@solu-m.com
+9. Kubernetes Control VMs:
+		ASSET TRACKER
+		-------------------
+		Host: 52.141.62.33
+		uid:  assettracker
+		pwd:  solum@202006!
+
+		STAGE00 ENV
+		-------------------
+		Host : 52.141.62.33
+		uid : common00
+		pwd : solum@202006!
+
+		STI ENV
+		-------------------
+		Host : 52.141.62.33
+		uid : sti
+		pwd : solum@202006!
+
+		ASIA ENV
+		-------------------
+		Host : 52.141.62.33
+		uid : asia01
+		pwd : solum@202006!
+
+		SEG ENV
+		-------------------
+		Host : 20.52.132.60
+		uid : seg
+		pwd : solum@202006!
+
+		EASTUS ENV
+		-------------------
+		Host : 52.141.62.33
+		uid : eastus01
+		pwd : solum@202006!
+10. solum GitHub personal access token: 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
+11. Pickcel URL: https://stage00-api.pickcel.solumesl.com
+12. SEG VM: https://portal.azure.com/#@solumpro1.onmicrosoft.com/resource/subscriptions/7ab0a287-[…]Microsoft.Compute/virtualMachines/AKS-Monitor-SEG/networking
+
